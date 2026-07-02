@@ -1,66 +1,91 @@
-document.addEventListener("DOMContentLoaded", () => {
-    // Mobile Menu Toggle
-    const mobileMenuBtn = document.querySelector(".mobile-menu-btn");
-    const navList = document.querySelector(".nav-list");
+// ===== MENU MOBILE =====
+const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+const navList = document.querySelector('.nav-list');
 
-    if (mobileMenuBtn && navList) {
-        mobileMenuBtn.addEventListener("click", () => {
-            navList.classList.toggle("active");
-            mobileMenuBtn.classList.toggle("active");
-        });
+if (mobileMenuBtn) {
+    mobileMenuBtn.addEventListener('click', () => {
+        mobileMenuBtn.classList.toggle('active');
+        navList.classList.toggle('active');
+    });
+}
 
-        // Close menu when a link is clicked
-        const navLinks = document.querySelectorAll(".nav-link");
-        navLinks.forEach(link => {
-            link.addEventListener("click", () => {
-                if (navList.classList.contains("active")) {
-                    navList.classList.remove("active");
-                    mobileMenuBtn.classList.remove("active");
-                }
-            });
-        });
-    }
+// Fechar menu ao clicar em um link
+document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+        mobileMenuBtn.classList.remove('active');
+        navList.classList.remove('active');
+    });
+});
 
-    // Portfolio Filter
-    const filterButtons = document.querySelectorAll(".filter-btn");
-    const portfolioItems = document.querySelectorAll(".portfolio-item");
+// ===== FILTRO DO PORTFÓLIO =====
+const filterBtns = document.querySelectorAll('.filter-btn');
+const portfolioItems = document.querySelectorAll('.portfolio-item');
 
-    if (filterButtons.length > 0 && portfolioItems.length > 0) {
-        filterButtons.forEach(button => {
-            button.addEventListener("click", () => {
-                // Remove active class from all buttons
-                filterButtons.forEach(btn => btn.classList.remove("active"));
-                // Add active class to the clicked button
-                button.classList.add("active");
+filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        // Remover classe active de todos os botões
+        filterBtns.forEach(b => b.classList.remove('active'));
+        // Adicionar classe active ao botão clicado
+        btn.classList.add('active');
 
-                const filterValue = button.getAttribute("data-filter");
+        const filter = btn.getAttribute('data-filter');
 
-                portfolioItems.forEach(item => {
-                    const itemCategories = item.getAttribute("data-category").split(" ");
-                    if (filterValue === "todos" || itemCategories.includes(filterValue)) {
-                        item.style.display = "block"; // Show item
-                        item.classList.remove("hide"); // Ensure it's not hidden by class
-                    } else {
-                        item.style.display = "none"; // Hide item
-                        item.classList.add("hide"); // Add hide class for potential CSS transitions
-                    }
-                });
-            });
-        });
-    }
-
-    // Smooth Scrolling (Optional)
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href');
-            const targetElement = document.querySelector(targetId);
-            if(targetElement){
-                targetElement.scrollIntoView({
-                    behavior: 'smooth'
-                });
+        portfolioItems.forEach(item => {
+            const categories = item.getAttribute('data-category');
+            if (filter === 'todos' || categories.includes(filter)) {
+                item.classList.remove('hidden');
+            } else {
+                item.classList.add('hidden');
             }
         });
     });
+});
 
+// ===== SCROLL SUAVE PARA LINKS INTERNOS =====
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+
+// ===== HEADER SCROLL EFFECT =====
+window.addEventListener('scroll', () => {
+    const header = document.querySelector('.header');
+    if (window.scrollY > 100) {
+        header.style.padding = '10px 0';
+        header.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.3)';
+    } else {
+        header.style.padding = '15px 0';
+        header.style.boxShadow = 'none';
+    }
+});
+
+// ===== ANIMAÇÃO DE ENTRADA (INTERSECTION OBSERVER) =====
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+        }
+    });
+}, observerOptions);
+
+// Aplicar animação de entrada nas seções
+document.querySelectorAll('.feature-card, .service-card, .portfolio-item, .contact-card').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
 });
